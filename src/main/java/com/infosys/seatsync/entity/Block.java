@@ -13,11 +13,18 @@ public class Block {
     private String blockName;
     private Integer totalSeats;
 
+    @Enumerated(EnumType.STRING)
+    private AccessType accessType;
+
     @ManyToOne
     @JoinColumn(name = "dc_id")
     private DeliveryCenter deliveryCenter;
 
     public Block() {
+    }
+
+    public enum AccessType {
+        RESTRICTED, UNRESTRICTED
     }
 }
 
