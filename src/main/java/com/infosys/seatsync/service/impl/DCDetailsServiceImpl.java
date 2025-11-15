@@ -2,7 +2,6 @@ package com.infosys.seatsync.service.impl;
 
 import com.infosys.seatsync.dto.*;
 import com.infosys.seatsync.entity.infra.Block;
-import com.infosys.seatsync.entity.infra.Wing;
 import com.infosys.seatsync.repository.BlockRepository;
 import com.infosys.seatsync.repository.WingRepository;
 import com.infosys.seatsync.service.DCDetailsService;
