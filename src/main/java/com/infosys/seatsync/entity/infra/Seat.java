@@ -19,42 +19,51 @@ public class Seat {
     private Wing wing;
 
     public Long getSeatId() {
-        return seatId;
-    }
+		return seatId;
+	}
 
-    public void setSeatId(Long seatId) {
-        this.seatId = seatId;
-    }
+	public void setSeatId(Long seatId) {
+		this.seatId = seatId;
+	}
 
-    public String getHashCode() {
-        return hashCode;
-    }
+	public String getSeatCode() {
+		return seatCode;
+	}
 
-    public void setHashCode(String hashCode) {
-        this.hashCode = hashCode;
-    }
+	public void setSeatCode(String seatCode) {
+		this.seatCode = seatCode;
+	}
 
-    public String getSeatCode() {
-        return seatCode;
-    }
+	public String getCubicleId() {
+		return cubicleId;
+	}
 
-    public void setSeatCode(String seatCode) {
-        this.seatCode = seatCode;
-    }
+	public void setCubicleId(String cubicleId) {
+		this.cubicleId = cubicleId;
+	}
 
-    public String getCubicleId() {
-        return cubicleId;
-    }
+	public Boolean getIsAvailable() {
+		return isAvailable;
+	}
 
-    public void setCubicleId(String cubicleId) {
-        this.cubicleId = cubicleId;
-    }
+	public void setIsAvailable(Boolean isAvailable) {
+		this.isAvailable = isAvailable;
+	}
 
-    public Wing getWing() {
-        return wing;
-    }
+	public String getBookedBy() {
+		return bookedBy;
+	}
 
-    public void setWing(Wing wing) {
-        this.wing = wing;
-    }
+	public void setBookedBy(String bookedBy) {
+		this.bookedBy = bookedBy;
+	}
+
+	public Wing getWing() {
+		return wing;
+	}
+
+	public void setWing(Wing wing) {
+		this.wing = wing;
+	}
+
 }
