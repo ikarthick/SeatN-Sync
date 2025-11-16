@@ -30,5 +30,9 @@ public interface SeatBookingRepository extends JpaRepository<Booking, Long> {
 	@Query("SELECT b FROM Booking b WHERE b.status = 'BOOKED' AND b.bookingDate = :today")
 	List<Booking> findTodayBooked(@Param("today") String today);
 
+	Optional<List<Booking>> findByEmployee_EmpId(String empId);
+
+	Optional<List<Booking>> findByEmployee_Manager_EmpId(String managerId);
+
 
 }
