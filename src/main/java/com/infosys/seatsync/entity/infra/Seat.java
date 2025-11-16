@@ -10,11 +10,9 @@ public class Seat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seatId;
-
+    private String hashCode;
     private String seatCode;
     private String cubicleId;
-    private Boolean isAvailable = true;
-    private String bookedBy;
 
     @ManyToOne
     @JoinColumn(name = "wing_id")
