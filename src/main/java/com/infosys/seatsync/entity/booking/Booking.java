@@ -30,7 +30,15 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "booked_by")
     private Employee bookedBy;  // Team lead booking
-
+    
+    private Boolean isfullDayBooked=false;
+    
+    private Boolean isSlotABooked=false;
+    
+    private Boolean isSlotBBooked=false;
+    
+    private Boolean isSlotCBooked=false;
+ 
     public enum BookingStatus {
         BOOKED, CHECKED_IN, RELEASED, AUTO_RELEASED, CANCELLED
     }
@@ -98,5 +106,37 @@ public class Booking {
 	public void setBookedBy(Employee bookedBy) {
 		this.bookedBy = bookedBy;
 	}
-   
+
+	public Boolean getIsfullDayBooked() {
+		return isfullDayBooked;
+	}
+
+	public void setIsfullDayBooked(Boolean isfullDayBooked) {
+		this.isfullDayBooked = isfullDayBooked;
+	}
+
+	public Boolean getIsSlotABooked() {
+		return isSlotABooked;
+	}
+
+	public void setIsSlotABooked(Boolean isSlotABooked) {
+		this.isSlotABooked = isSlotABooked;
+	}
+
+	public Boolean getIsSlotBBooked() {
+		return isSlotBBooked;
+	}
+
+	public void setIsSlotBBooked(Boolean isSlotBBooked) {
+		this.isSlotBBooked = isSlotBBooked;
+	}
+
+	public Boolean getIsSlotCBooked() {
+		return isSlotCBooked;
+	}
+
+	public void setIsSlotCBooked(Boolean isSlotCBooked) {
+		this.isSlotCBooked = isSlotCBooked;
+	}
+
 }
