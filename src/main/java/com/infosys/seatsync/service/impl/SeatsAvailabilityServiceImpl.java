@@ -2,13 +2,10 @@ package com.infosys.seatsync.service.impl;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import com.infosys.seatsync.entity.booking.WaitList;
+import com.infosys.seatsync.repository.WaitlistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +30,9 @@ public class SeatsAvailabilityServiceImpl implements SeatsAvailabilityService {
 
 	@Autowired
 	SeatBookingRepository bookingRepository;
+
+	@Autowired
+	WaitlistRepository waitlistRepository;
 
 	List<String> blockingSeats = List.of("BOOKED", "CHECKED_IN");
 
@@ -93,7 +93,32 @@ public class SeatsAvailabilityServiceImpl implements SeatsAvailabilityService {
 			ba.setWingId(req.getWingId());
 			ba.setTotalSeats(seats.size());
 			ba.setAvailableSeats(available);
- 			map.put(date, ba);
+
+			// -----------------------
+			//  ADD CURRENT STATUS LOGIC
+			// -----------------------
+
+			if (available > 0) {
+				// Seats available → No WL status required
+				ba.setCurrentStatus(null);
+
+			} else {
+
+				// check waitlist for this wing
+				Optional<WaitList> nextWait = waitlistRepository
+						.findTopByWing_WingIdAndStatusOrderByPriorityAsc(
+								req.getWingId(), WaitList.WaitlistStatus.WAITING);
+
+				if (nextWait.isPresent()) {
+					// next priority = smallest priority in table
+					ba.setCurrentStatus("WL-" + nextWait.get().getPriority());
+				} else {
+					// no one in WL → WL-0 (basically new WL entry will become 1)
+					ba.setCurrentStatus("WL-0");
+				}
+			}
+
+			map.put(date, ba);
 			logger.info("processFullDay :::  " + map.toString());
 		}
 		return map;

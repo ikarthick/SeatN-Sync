@@ -1,13 +1,12 @@
 package com.infosys.seatsync.entity.booking;
 
 import com.infosys.seatsync.entity.emp.Employee;
-import com.infosys.seatsync.entity.infra.Block;
+import com.infosys.seatsync.entity.infra.Wing;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "waitlist")
-public class Waitlist {
+public class WaitList {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,16 +17,15 @@ public class Waitlist {
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
-    // The seat/block/DC the employee requested
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "block_id", nullable = false)
-    private Block block;
+    @JoinColumn(name = "wing_id", nullable = false)
+    private Wing wing;
 
-    @Column(name = "priority_position")
-    private int priorityPosition; // e.g., 1 for WL1, 2 for WL2, etc.
+    @Column(name = "priority")
+    private int priority; // e.g., 1 for WL1, 2 for WL2, etc.
 
-    @Column(name = "requested_date")
-    private LocalDateTime requestedDate;
+    @Column(name = "booking_date")
+    private String bookingDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
@@ -36,16 +34,33 @@ public class Waitlist {
     @Column(name = "remarks")
     private String remarks;
 
-    public Waitlist() {}
-
-    public Waitlist(Employee employee, Block block, int priorityPosition, LocalDateTime requestedDate, WaitlistStatus status) {
-        this.employee = employee;
-        this.block = block;
-        this.priorityPosition = priorityPosition;
-        this.requestedDate = requestedDate;
-        this.status = status;
+    public String getBookingDate() {
+        return bookingDate;
     }
 
+    public WaitList(Long id, Employee employee, Wing wing, int priority, String bookingDate, WaitlistStatus status, String remarks) {
+        this.id = id;
+        this.employee = employee;
+        this.wing = wing;
+        this.priority = priority;
+        this.bookingDate = bookingDate;
+        this.status = status;
+        this.remarks = remarks;
+    }
+
+    public Wing getWing() {
+        return wing;
+    }
+
+    public void setWing(Wing wing) {
+        this.wing = wing;
+    }
+
+    public void setBookingDate(String bookingDate) {
+        this.bookingDate = bookingDate;
+    }
+
+    public WaitList() {}
     // Getters and Setters
     public Long getId() { return id; }
 
@@ -55,18 +70,9 @@ public class Waitlist {
 
     public void setEmployee(Employee employee) { this.employee = employee; }
 
-    public Block getBlock() { return block; }
+    public int getPriority() { return priority; }
 
-    public void setBlock(Block block) { this.block = block; }
-
-    public int getPriorityPosition() { return priorityPosition; }
-
-    public void setPriorityPosition(int priorityPosition) { this.priorityPosition = priorityPosition; }
-
-    public LocalDateTime getRequestedDate() { return requestedDate; }
-
-    public void setRequestedDate(LocalDateTime requestedDate) { this.requestedDate = requestedDate; }
-
+    public void setPriority(int priority) { this.priority = priority; }
     public WaitlistStatus getStatus() { return status; }
 
     public void setStatus(WaitlistStatus status) { this.status = status; }
@@ -76,6 +82,8 @@ public class Waitlist {
     public void setRemarks(String remarks) { this.remarks = remarks; }
 
     public enum WaitlistStatus {
+        WAITING,
+        ALLOTTED,
         ACTIVE,          // Currently on waitlist
         PROMOTED,        // Moved up (e.g., from WL4 → WL3)
         CONFIRMED,       // Got a seat

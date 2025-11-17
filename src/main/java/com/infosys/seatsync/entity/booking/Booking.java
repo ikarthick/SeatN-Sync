@@ -40,7 +40,7 @@ public class Booking {
     private Boolean isSlotCBooked=false;
  
     public enum BookingStatus {
-        BOOKED, CHECKED_IN, RELEASED, AUTO_RELEASED, CANCELLED
+        BOOKED, CHECKED_IN, RELEASED, AUTO_RELEASED, ASSIGNED_FROM_WAITLIST,CANCELLED
     }
 
 	public Long getBookingId() {

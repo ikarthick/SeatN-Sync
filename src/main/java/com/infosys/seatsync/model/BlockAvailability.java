@@ -6,6 +6,16 @@ public class BlockAvailability {
 	private int totalSeats;
 	private int availableSeats;
 
+	private String currentStatus;
+
+	public String getCurrentStatus() {
+		return currentStatus;
+	}
+
+	public void setCurrentStatus(String currentStatus) {
+		this.currentStatus = currentStatus;
+	}
+
 	public BlockAvailability() {
 	}
 
