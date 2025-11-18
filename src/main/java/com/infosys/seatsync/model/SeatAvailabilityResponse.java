@@ -7,6 +7,25 @@ public class SeatAvailabilityResponse {
 	private Map<String, BlockAvailability> fullDayAvailability;
 	private Map<String, List<String>> slotAvailability;
 
+	private String status;
+	private String message;
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
 	public Map<String, BlockAvailability> getFullDayAvailability() {
 		return fullDayAvailability;
 	}

@@ -1,6 +1,7 @@
 package com.infosys.seatsync.entity.emp;
 
 import com.infosys.seatsync.entity.infra.DeliveryCenter;
+import com.infosys.seatsync.entity.infra.Wing;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,7 +15,7 @@ public class Employee {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private AccessType odcAccessType;
+    private Wing.AccessType odcAccessType;
 
     // Self-join for manager mapping
     @ManyToOne

@@ -59,6 +59,12 @@ public class SeatsAvailabilityServiceImpl implements SeatsAvailabilityService {
 
 		// Fetch seats for wing
 		List<Seat> seats = seatRepository.getSeatsByWing(wingId);
+
+		if(seats.isEmpty()){
+			response.setMessage("Seats were not been added to specific wing Id:"+ wingId);
+			response.setStatus("NO_SEATS_ADDED");
+			return response;
+		}
 		
 		logger.info("SeatAvailabilityResponse :::: seats" + seats);
 
