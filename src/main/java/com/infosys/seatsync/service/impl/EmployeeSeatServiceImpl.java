@@ -62,6 +62,7 @@ public class EmployeeSeatServiceImpl implements EmployeeSeatService {
                                 return dto;
                             }).toList();
 
+            employeeSeatResponseDto.setEmpSeats(responseList);
             employeeSeatResponseDto.setStatus("SUCCESS");
             employeeSeatResponseDto.setMessage("Employee seats has been successfully retrieved for employee Id: "+ empId);
             employeeSeatResponseDto.setTeamProximitySugguestionDto(checkTeamProximitySeats(empId));

@@ -3,14 +3,8 @@ package com.infosys.seatsync.entity.emp;
 import java.util.Objects;
 
 import com.infosys.seatsync.entity.infra.DeliveryCenter;
-
-import jakarta.persistence.AccessType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.infosys.seatsync.entity.infra.Wing;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -23,7 +17,7 @@ public class Employee {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private AccessType odcAccessType;
+    private Wing.AccessType odcAccessType;
 
     // Self-join for manager mapping
     @ManyToOne
@@ -38,85 +32,84 @@ public class Employee {
     @JoinColumn(name = "home_dc_id")
     private DeliveryCenter homeDC;
 
-	public String getEmpId() {
-		return empId;
-	}
+    public Employee(String empId, String name, String email, Wing.AccessType odcAccessType, Employee manager, Project project, DeliveryCenter homeDC) {
+        this.empId = empId;
+        this.name = name;
+        this.email = email;
+        this.odcAccessType = odcAccessType;
+        this.manager = manager;
+        this.project = project;
+        this.homeDC = homeDC;
+    }
 
-	public void setEmpId(String empId) {
-		this.empId = empId;
-	}
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "empId='" + empId + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", odcAccessType=" + odcAccessType +
+                ", project=" + project +
+                ", homeDC=" + homeDC +
+                '}';
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getEmpId() {
+        return empId;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setEmpId(String empId) {
+        this.empId = empId;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public AccessType getOdcAccessType() {
-		return odcAccessType;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setOdcAccessType(AccessType odcAccessType) {
-		this.odcAccessType = odcAccessType;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public Employee getManager() {
-		return manager;
-	}
+    public Wing.AccessType getOdcAccessType() {
+        return odcAccessType;
+    }
 
-	public void setManager(Employee manager) {
-		this.manager = manager;
-	}
+    public void setOdcAccessType(Wing.AccessType odcAccessType) {
+        this.odcAccessType = odcAccessType;
+    }
 
-	public Project getProject() {
-		return project;
-	}
+    public Employee getManager() {
+        return manager;
+    }
 
-	public void setProject(Project project) {
-		this.project = project;
-	}
+    public void setManager(Employee manager) {
+        this.manager = manager;
+    }
 
-	public DeliveryCenter getHomeDC() {
-		return homeDC;
-	}
+    public Project getProject() {
+        return project;
+    }
 
-	public void setHomeDC(DeliveryCenter homeDC) {
-		this.homeDC = homeDC;
-	}
+    public void setProject(Project project) {
+        this.project = project;
+    }
 
-	@Override
-	public String toString() {
-		return "Employee [empId=" + empId + ", name=" + name + ", email=" + email + ", odcAccessType=" + odcAccessType
-				+ ", manager=" + manager + ", project=" + project + ", homeDC=" + homeDC + "]";
-	}
+    public DeliveryCenter getHomeDC() {
+        return homeDC;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(email, empId, homeDC, manager, name, odcAccessType, project);
-	}
+    public void setHomeDC(DeliveryCenter homeDC) {
+        this.homeDC = homeDC;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Employee other = (Employee) obj;
-		return Objects.equals(email, other.email) && Objects.equals(empId, other.empId)
-				&& Objects.equals(homeDC, other.homeDC) && Objects.equals(manager, other.manager)
-				&& Objects.equals(name, other.name) && odcAccessType == other.odcAccessType
-				&& Objects.equals(project, other.project);
-	}
+    public Employee() {
+    }
 }
