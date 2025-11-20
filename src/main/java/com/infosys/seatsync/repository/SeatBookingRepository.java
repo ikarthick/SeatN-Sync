@@ -3,7 +3,9 @@ package com.infosys.seatsync.repository;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -17,7 +19,7 @@ public interface SeatBookingRepository extends JpaRepository<Booking, Long> {
             "WHERE b.seat_id = :seatId " +
             "AND b.booking_date = :date " +
             "AND b.status IN ('BOOKED', 'CHECKED_IN')", 
-    nativeQuery = true)	
+    nativeQuery = true)
 	List<Booking> findBookingInfo(@Param("seatId") Long seatId, @Param("date") String date);
 
 	Optional<Booking> findByEmployee_EmpIdAndSeat_HashCodeAndBookingDateAndStatus(
@@ -34,14 +36,15 @@ public interface SeatBookingRepository extends JpaRepository<Booking, Long> {
 
 	Optional<List<Booking>> findByEmployee_Manager_EmpId(String managerId);
 
-	List<Booking> findAllByBookingDateAndBookedBy(String date, Long empId);
+	//List<Booking> findAllByBookingDateAndBookedBy_EmpId(String bookingDate, Long empId);
 
-	List<Booking> findStatusBySeat(Long s);
-	
-	 @Query("select b from Booking b " +
-	           "where b.employee.manager.empId = :managerId " +
-			   "and b.seat_id.wing_id = :wingId" +
-	           "and b.bookingDate = :date and b.status IN ('BOOKED', 'CHECKED_IN')")
-	 List<Booking> findBookings(@Param("managerId") String managerId,
-	                                                @Param("date") String bookingDate, Long wingId);
+	//List<Booking> findStatusBySeat(Long s);
+
+	@Query("select b from Booking b where b.employee.manager.empId = :managerId and b.seat.wing.wingId = :wingId and b.bookingDate = :date and b.status IN ('BOOKED', 'CHECKED_IN')")
+			List<Booking> findBookings(
+			@Param("managerId") String managerId,
+			@Param("date") String date,
+			@Param("wingId") Long wingId
+	);
+
 }

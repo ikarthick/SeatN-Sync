@@ -19,20 +19,20 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
     @Query("SELECT s FROM Seat s WHERE s.wing.wingId = :wingId")
     List<Seat> getSeatsByWing(@Param("wingId") Long wingId);
 
-    @Query("SELECT COUNT(s) FROM Seat s WHERE s.wing.wingId = :wingId")
-    long countSeatsByWing(@Param("wingId") Long wingId);
+//    @Query("SELECT COUNT(s) FROM Seat s WHERE s.wing.wingId = :wingId")
+//    long countSeatsByWing(@Param("wingId") Long wingId);
 
-	List<Long> findSeatIdByCubicleId(String c);
+//	List<Long> findSeatIdByCubicleId(String c);
     
-	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	@Query("select s from Seat s where s.cubicle.cubicleId = :cubicleId and s.wing.wingId = :wingId and s.isAvailable = true")
-	List<Seat> findAvailableSeatsForCubicleForUpdate(@Param("cubicleId") String cubicleId,
-	                                              @Param("wingId") Long wingId);
-	
-	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	@Query("SELECT s FROM Seat s " +
-	       "WHERE s.wing.wingId = :wingId " +
-	       "AND s.isAvailable = true")
-	List<Seat> findAvailableSeatsInWingForUpdate(@Param("wingId") Long wingId);
+//	@Lock(LockModeType.PESSIMISTIC_WRITE)
+//	@Query("select s from Seat s where s.cubicleId = :cubicleId and s.wing.wingId = :wingId and s.isAvailable = true")
+//	List<Seat> findAvailableSeatsForCubicleForUpdate(@Param("cubicleId") String cubicleId,
+//	                                              @Param("wingId") Long wingId);
+//
+//	@Lock(LockModeType.PESSIMISTIC_WRITE)
+//	@Query("SELECT s FROM Seat s " +
+//	       "WHERE s.wing.wingId = :wingId " +
+//	       "AND s.isAvailable = true")
+//	List<Seat> findAvailableSeatsInWingForUpdate(@Param("wingId") Long wingId);
 
 }

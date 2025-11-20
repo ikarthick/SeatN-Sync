@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 
 	private static final int CUBICLE_CAPACITY = 4;
 
+	@Transactional
 	@Override
 	public BookSeatResponse bookASeat(BookSeatsRequest request) {
 
@@ -54,6 +56,15 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 		String empId = request.getEmployee_id();
 		Optional<Employee> bookingEmployee = employeeRepository.findById(empId);
 
+		if(bookingEmployee.isEmpty()) {
+			throw new RuntimeException("Employee not present");
+		}
+
+		if(request.getDates() == null || request.getDates().isEmpty())
+			throw new IllegalArgumentException("Booking dates cannot be empty");
+
+		boolean allocated = false; // flag which denotes whether seat is booked or not
+
 		// 2.get the manager id of the employee
 		String managerId = bookingEmployee.get().getManager().getEmpId();
 		logger.info("Manager Id of the employee ::: {}", managerId);
@@ -62,8 +73,6 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 		Long wingId = request.getWingId();
 		List<Seat> wingSeats = seatRepository.getSeatsByWing(wingId);
 		Map<String, List<Seat>> seatsByCubicle = wingSeats.stream().collect(Collectors.groupingBy(Seat::getCubicleId));
-
-		boolean allocated = false; // flag which denotes whether seat is booked or not
 
 		/*
 		 * for each date perform below steps, 
@@ -86,6 +95,8 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 
 		for (String date : request.getDates()) {
 
+			allocated = false;
+
 			AllocationResult result = new AllocationResult();
 			result.setEmpId(empId);
 			result.setDate(date);
@@ -96,10 +107,10 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 				Optional<Seat> free = findAnyFreeSeat(wingSeats, date);
 				if (free.isPresent()) {
 					try {
-						assignSeatAndPersist(empId, managerId, date, free.get(), result, managerId, bookingEmployee);
+						assignSeatAndPersist(empId, managerId, date, free.get(), result, bookingEmployee);
 						allocated = true;
 					} catch (Throwable e) {
-						logger.error("Error occured while trying to book seat : " + e.getStackTrace());
+						logger.error("Error occurred while trying to book seat : " + e.getMessage());
 					}
 				} else {
 					result.setWaitlisted(true);
@@ -125,7 +136,7 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 					List<Seat> cubicleSeats = seatsByCubicle.getOrDefault(cubicleId, Collections.emptyList());
 					Optional<Seat> freeSeat = cubicleSeats.stream().filter(s -> isSeatFree(s, date)).findFirst();
 					if (freeSeat.isPresent()) {
-						assignSeatAndPersist(empId, managerId, date, freeSeat.get(), result, managerId,
+						assignSeatAndPersist(empId, managerId, date, freeSeat.get(), result,
 								bookingEmployee);
 						allocated = true;
 						break;
@@ -147,7 +158,7 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 				List<Seat> seats = seatsByCubicle.getOrDefault(nearestCub, Collections.emptyList());
 				Optional<Seat> freeSeat = seats.stream().filter(s -> isSeatFree(s, date)).findFirst();
 				if (freeSeat.isPresent()) {
-					assignSeatAndPersist(empId, managerId, date, freeSeat.get(), result, managerId, bookingEmployee);
+					assignSeatAndPersist(empId, managerId, date, freeSeat.get(), result, bookingEmployee);
 					response.getResults().add(result);
 					continue;
 				}
@@ -156,7 +167,7 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 			// fallback - any free seat in wing
 			Optional<Seat> anyFree = findAnyFreeSeat(wingSeats, date);
 			if (anyFree.isPresent()) {
-				assignSeatAndPersist(empId, managerId, date, anyFree.get(), result, managerId, bookingEmployee);
+				assignSeatAndPersist(empId, managerId, date, anyFree.get(), result, bookingEmployee);
 			} else {
 				// STEP 7: no seats -> waitlist
 				result.setWaitlisted(true);
@@ -178,8 +189,7 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 		return bookings.isEmpty();
 	}
 
-	private void assignSeatAndPersist(String empId, String managerId, String date, Seat seat, AllocationResult result,
-			String ManagerId, Optional<Employee> bookingEmployee) {
+	private void assignSeatAndPersist(String empId, String managerId, String date, Seat seat, AllocationResult result, Optional<Employee> bookingEmployee) {
 		result.setAllocatedSeatCode(seat.getSeatCode());
 		result.setAllocatedCubicleId(seat.getCubicleId());
 		result.setWaitlisted(false);
