@@ -27,4 +27,44 @@ public class QRCheckIn {
     @OneToOne
     @JoinColumn(name = "booking_id")
     private Booking booking;
+
+	public Long getCheckinId() {
+		return checkinId;
+	}
+
+	public void setCheckinId(Long checkinId) {
+		this.checkinId = checkinId;
+	}
+
+	public LocalDateTime getCheckinTime() {
+		return checkinTime;
+	}
+
+	public void setCheckinTime(LocalDateTime checkinTime) {
+		this.checkinTime = checkinTime;
+	}
+
+	public Seat getSeat() {
+		return seat;
+	}
+
+	public void setSeat(Seat seat) {
+		this.seat = seat;
+	}
+
+	public Employee getEmployee() {
+		return employee;
+	}
+
+	public void setEmployee(Employee employee) {
+		this.employee = employee;
+	}
+
+	public Booking getBooking() {
+		return booking;
+	}
+
+	public void setBooking(Booking booking) {
+		this.booking = booking;
+	}
 }

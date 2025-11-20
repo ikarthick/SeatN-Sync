@@ -34,5 +34,14 @@ public interface SeatBookingRepository extends JpaRepository<Booking, Long> {
 
 	Optional<List<Booking>> findByEmployee_Manager_EmpId(String managerId);
 
+	List<Booking> findAllByBookingDateAndBookedBy(String date, Long empId);
 
+	List<Booking> findStatusBySeat(Long s);
+	
+	 @Query("select b from Booking b " +
+	           "where b.employee.manager.empId = :managerId " +
+			   "and b.seat_id.wing_id = :wingId" +
+	           "and b.bookingDate = :date and b.status IN ('BOOKED', 'CHECKED_IN')")
+	 List<Booking> findBookings(@Param("managerId") String managerId,
+	                                                @Param("date") String bookingDate, Long wingId);
 }
