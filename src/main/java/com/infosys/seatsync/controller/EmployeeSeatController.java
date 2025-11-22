@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/infy/emp")
 public class EmployeeSeatController {
-
     private EmployeeSeatService employeeSeatService;
 
     public EmployeeSeatController(EmployeeSeatService employeeSeatService) {

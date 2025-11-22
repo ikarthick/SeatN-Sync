@@ -10,8 +10,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.infosys.seatsync.dto.CancelBookingRequestDto;
+import com.infosys.seatsync.dto.ResponseDto;
 import com.infosys.seatsync.entity.booking.WaitList;
 import com.infosys.seatsync.entity.infra.Wing;
+import com.infosys.seatsync.exception.BusinessException;
 import com.infosys.seatsync.repository.*;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -188,6 +191,42 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 		}
 
 		return response;
+	}
+
+	@Override
+	public ResponseDto cancelSeat(CancelBookingRequestDto requestDto) {
+		ResponseDto responseDto = new ResponseDto();
+
+		if(Optional.ofNullable(requestDto.getBookingId()).isPresent()){
+			//check booking id is valid
+			Optional<Booking> booking = seatBookingRepository.findById(requestDto.getBookingId());
+			if(booking.isPresent()){
+				Booking updatedBooking = booking.get();
+				updatedBooking.setStatus(BookingStatus.CANCELLED);
+				seatBookingRepository.save(updatedBooking);
+				responseDto.setStatus("SUCCESS");
+				responseDto.setMessage("Seat Booking has been successfully cancelled");
+			} else {
+				throw new BusinessException("INVALID_BOOKING", "Booking Id doesn't match with our records");
+			}
+		}
+
+		if(Optional.ofNullable(requestDto.getWaitListId()).isPresent()){
+			//check waiting list id is valid
+			Optional<WaitList> waitList = waitlistRepository.findById(requestDto.getWaitListId());
+			if(waitList.isPresent()){
+				WaitList updatedWaitList = waitList.get();
+				updatedWaitList.setStatus(WaitList.WaitlistStatus.CANCELLED);
+				waitlistRepository.save(updatedWaitList);
+				responseDto.setStatus("SUCCESS");
+				responseDto.setMessage("Seat Booking has been successfully cancelled");
+			} else {
+				throw new BusinessException("INVALID_WAITLIST", "WaitList Id doesn't match with our records");
+			}
+		}
+
+		//check if the seat
+		return responseDto;
 	}
 
 	@Transactional

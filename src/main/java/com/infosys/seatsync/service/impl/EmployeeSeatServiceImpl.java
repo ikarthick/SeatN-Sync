@@ -4,10 +4,12 @@ import com.infosys.seatsync.dto.EmployeeSeatResponseDto;
 import com.infosys.seatsync.dto.EmployeeSeatResponsePayloadDto;
 import com.infosys.seatsync.dto.TeamProximitySugguestionDto;
 import com.infosys.seatsync.entity.booking.Booking;
+import com.infosys.seatsync.entity.booking.WaitList;
 import com.infosys.seatsync.entity.emp.Employee;
 import com.infosys.seatsync.entity.infra.Seat;
 import com.infosys.seatsync.repository.EmployeeRepository;
 import com.infosys.seatsync.repository.SeatBookingRepository;
+import com.infosys.seatsync.repository.WaitlistRepository;
 import com.infosys.seatsync.service.EmployeeSeatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,9 @@ public class EmployeeSeatServiceImpl implements EmployeeSeatService {
     @Autowired
     EmployeeRepository employeeRepository;
 
+    @Autowired
+    WaitlistRepository waitlistRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(SeatsAvailabilityServiceImpl.class);
 
     @Override
@@ -34,6 +40,11 @@ public class EmployeeSeatServiceImpl implements EmployeeSeatService {
         EmployeeSeatResponseDto employeeSeatResponseDto = new EmployeeSeatResponseDto();
 
         Optional<List<Booking>> listOfBookings = seatBookingRepository.findByEmployee_EmpId(empId);
+
+        // 2. Fetch waiting list entries
+        List<WaitList> waitlists = waitlistRepository
+                .findByEmployee_EmpIdOrderByBookingDateAsc(empId);
+
         if(listOfBookings.isEmpty()){
             employeeSeatResponseDto.setStatus("NO_BOOKING_FOUND");
             employeeSeatResponseDto.setMessage("There is no seat booking for employee Id: "+ empId);
@@ -43,7 +54,7 @@ public class EmployeeSeatServiceImpl implements EmployeeSeatService {
 
             //Map the required fields based on booking details
             List<EmployeeSeatResponsePayloadDto> responseList =
-                    listOfBookings.orElse(Collections.emptyList())
+                    new java.util.ArrayList<>(listOfBookings.orElse(Collections.emptyList())
                             .stream()
                             .map(booking -> {
                                 EmployeeSeatResponsePayloadDto dto = new EmployeeSeatResponsePayloadDto();
@@ -59,8 +70,35 @@ public class EmployeeSeatServiceImpl implements EmployeeSeatService {
                                 dto.setAccessType(booking.getSeat().getWing().getAccessType().toString());
                                 dto.setStartTime(booking.getStartTime());
                                 dto.setEndTime(booking.getEndTime());
+                                dto.setCurrentStatus(booking.getStatus().toString());
                                 return dto;
-                            }).toList();
+                            }).toList());
+
+            // 4. Convert waiting list → DTO
+            List<EmployeeSeatResponsePayloadDto> wlDtos = waitlists.stream()
+                    .map(wl -> {
+                        EmployeeSeatResponsePayloadDto dto = new EmployeeSeatResponsePayloadDto();
+
+                        dto.setCity(wl.getWing().getBlock().getDeliveryCenter().getLocation());
+                        dto.setDcName(wl.getWing().getBlock().getDeliveryCenter().getDcName());
+                        dto.setBlockName(wl.getWing().getBlock().getBlockName());
+                        dto.setWingName(wl.getWing().getWingName());
+                        dto.setSeatName("-");
+                        dto.setBookingDate(wl.getBookingDate());
+                        dto.setAccessType(wl.getWing().getAccessType().name());
+                        dto.setStartTime("NA");
+                        dto.setEndTime("NA");
+
+                        dto.setCurrentStatus("WAITLIST-WL" + wl.getPriority());
+
+                        return dto;
+                    }).toList();
+
+            // 5. Merge both lists
+            responseList.addAll(wlDtos);
+
+            // 6. Sort by bookingDate ascending
+            responseList.sort(Comparator.comparing(EmployeeSeatResponsePayloadDto::getBookingDate));
 
             employeeSeatResponseDto.setEmpSeats(responseList);
             employeeSeatResponseDto.setStatus("SUCCESS");

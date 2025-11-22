@@ -1,13 +1,12 @@
 package com.infosys.seatsync.controller;
 
+import com.infosys.seatsync.dto.AttendanceResponseDto;
+import com.infosys.seatsync.dto.CancelBookingRequestDto;
+import com.infosys.seatsync.dto.ResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,5 +47,10 @@ public class SeatBookingController {
 			ex.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error");
 		}
+	}
+
+	@PostMapping(value = "/cancel")
+	public ResponseEntity<ResponseDto> cancelSeat(@RequestBody CancelBookingRequestDto cancelBookingRequestDto){
+		return new ResponseEntity<>(seatBookingService.cancelSeat(cancelBookingRequestDto), HttpStatus.OK);
 	}
 }
