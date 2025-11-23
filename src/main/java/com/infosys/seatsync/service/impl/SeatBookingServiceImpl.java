@@ -197,84 +197,74 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 
 				response.getResults().add(result);
 			}
-        
-		for(AllocationResult result:response.getResults()) {
-			if(null != result.getAllocatedSeatCode()) {
-				EmailDetails emailDetails=new EmailDetails();
-				emailDetails.setRecipient(bookingEmployee.get().getEmail());
-				String msg= "Seat id : " + result.getAllocatedSeatCode() + "Booked Successfully";
-				emailDetails.setMessageBody(msg);
-				emailDetails.setSubject("Seat Allocation Notification");
-				emailService.sendEmail(emailDetails);
+
+			for (AllocationResult result : response.getResults()) {
+				if (null != result.getAllocatedSeatCode()) {
+					EmailDetails emailDetails = new EmailDetails();
+					emailDetails.setRecipient(bookingEmployee.get().getEmail());
+					String msg = "Seat id : " + result.getAllocatedSeatCode() + "Booked Successfully";
+					emailDetails.setMessageBody(msg);
+					emailDetails.setSubject("Seat Allocation Notification");
+					emailService.sendEmail(emailDetails);
+				}
 			}
+			return response;
+		} catch (Exception exception){
+			throw new BusinessException("SEAT_ALLOCATION_ERROR", exception.getMessage());
 		}
-		return response;
 	}
 
 	@Override
 	public ResponseDto cancelSeat(CancelBookingRequestDto requestDto) {
 		ResponseDto responseDto = new ResponseDto();
 
-		if(Optional.ofNullable(requestDto.getBookingId()).isPresent()){
-			//check booking id is valid
-			Optional<Booking> booking = seatBookingRepository.findById(requestDto.getBookingId());
-			if(booking.isPresent()){
-				Booking updatedBooking = booking.get();
-				updatedBooking.setStatus(BookingStatus.CANCELLED);
-				seatBookingRepository.save(updatedBooking);
-				responseDto.setStatus("SUCCESS");
-				responseDto.setMessage("Seat Booking has been successfully cancelled");
-				if(responseDto.getStatus().equals("SUCCESS")) {
-					EmailDetails emailDetails=new EmailDetails();
-					emailDetails.setRecipient(booking.get().getEmployee().getEmail());
-					String msg= "Seat id : " + updatedBooking.getSeat().getSeatId() + " cancelled Successfully";
-					emailDetails.setMessageBody(msg);
-					emailDetails.setSubject("Seat Cancellation Notification");
-					emailService.sendEmail(emailDetails);
+		try {
+			if(Optional.ofNullable(requestDto.getBookingId()).isPresent()) {
+				//check booking id is valid
+				Optional<Booking> booking = seatBookingRepository.findById(requestDto.getBookingId());
+				if (booking.isPresent()) {
+					Booking updatedBooking = booking.get();
+					updatedBooking.setStatus(BookingStatus.CANCELLED);
+					seatBookingRepository.save(updatedBooking);
+					responseDto.setStatus("SUCCESS");
+					responseDto.setMessage("Seat Booking has been successfully cancelled");
+					if (responseDto.getStatus().equals("SUCCESS")) {
+						EmailDetails emailDetails = new EmailDetails();
+						emailDetails.setRecipient(booking.get().getEmployee().getEmail());
+						String msg = "Seat id : " + updatedBooking.getSeat().getSeatId() + " cancelled Successfully";
+						emailDetails.setMessageBody(msg);
+						emailDetails.setSubject("Seat Cancellation Notification");
+						emailService.sendEmail(emailDetails);
+					}
+				} else {
+					throw new BusinessException("INVALID_BOOKING", "Booking Id doesn't match with our records");
 				}
-			} else {
-				throw new BusinessException("INVALID_BOOKING", "Booking Id doesn't match with our records");
 			}
 
-		if(Optional.ofNullable(requestDto.getWaitListId()).isPresent()){
-			//check waiting list id is valid
-			Optional<WaitList> waitList = waitlistRepository.findById(requestDto.getWaitListId());
-			if(waitList.isPresent()){
-				WaitList updatedWaitList = waitList.get();
-				updatedWaitList.setStatus(WaitList.WaitlistStatus.CANCELLED);
-				waitlistRepository.save(updatedWaitList);
-				responseDto.setStatus("SUCCESS");
-				responseDto.setMessage("Seat Booking has been successfully cancelled");
-				if(responseDto.getStatus().equals("SUCCESS")) {
-					EmailDetails emailDetails=new EmailDetails();
-					emailDetails.setRecipient(waitList.get().getEmployee().getEmail());
-					String msg= "Waitinglist id : " + requestDto.getWaitListId() + " cancelled Successfully";
-					emailDetails.setMessageBody(msg);
-					emailDetails.setSubject("Seat Cancellation Notification");
-					emailService.sendEmail(emailDetails);
-				}
-			} else {
-				throw new BusinessException("INVALID_WAITLIST", "WaitList Id doesn't match with our records");
-			}
-
-			if(Optional.ofNullable(requestDto.getWaitListId()).isPresent()){
+			if (Optional.ofNullable(requestDto.getWaitListId()).isPresent()) {
 				//check waiting list id is valid
 				Optional<WaitList> waitList = waitlistRepository.findById(requestDto.getWaitListId());
-				if(waitList.isPresent()){
+				if (waitList.isPresent()) {
 					WaitList updatedWaitList = waitList.get();
 					updatedWaitList.setStatus(WaitList.WaitlistStatus.CANCELLED);
 					waitlistRepository.save(updatedWaitList);
 					responseDto.setStatus("SUCCESS");
 					responseDto.setMessage("Seat Booking has been successfully cancelled");
+					if (responseDto.getStatus().equals("SUCCESS")) {
+						EmailDetails emailDetails = new EmailDetails();
+						emailDetails.setRecipient(waitList.get().getEmployee().getEmail());
+						String msg = "Waitinglist id : " + requestDto.getWaitListId() + " cancelled Successfully";
+						emailDetails.setMessageBody(msg);
+						emailDetails.setSubject("Seat Cancellation Notification");
+						emailService.sendEmail(emailDetails);
+					}
 				} else {
 					throw new BusinessException("INVALID_WAITLIST", "WaitList Id doesn't match with our records");
 				}
 			}
-
-			//check if the seat
 			return responseDto;
 		} catch (Exception exception) {
-			throw new BusinessException("ERROR_CANCEL_SEAT", exception.getMessage());
+			throw new BusinessException("CANCEL_SEAT_ERROR", exception.getMessage());
 		}
 	}
 
