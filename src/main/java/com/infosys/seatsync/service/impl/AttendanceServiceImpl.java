@@ -42,9 +42,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 AttendanceLog attendanceLog = new AttendanceLog();
                 Optional<Employee> employeeOpt = employeeRepository.findById(emp);
                 if(employeeOpt.isEmpty()){
-                    attendanceResponseDto.setStatus("INVALID_EMP");
-                    attendanceResponseDto.setMessage("Unable to fetch the emp object");
-                    return attendanceResponseDto;
+                    throw new BusinessException("INVALID_EMP", "Unable to fetch the Emp Reference");
                 }
                 attendanceLog.setEmployee(employeeOpt.get());
                 attendanceLog.setLocation(location);
@@ -57,7 +55,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 attendanceResponseDto.setMessage("Employee Attendance has been recorded");
                 return attendanceResponseDto;
             } else {
-                throw new BusinessException("ATTENDANCE_EXISTS", "Attendance record already is already present ");
+                throw new BusinessException("ATTENDANCE_EXISTS", "Attendance record is already present ");
             }
 
         } catch (Exception exception){
