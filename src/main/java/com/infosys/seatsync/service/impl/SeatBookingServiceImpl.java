@@ -201,38 +201,43 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 
 	@Override
 	public ResponseDto cancelSeat(CancelBookingRequestDto requestDto) {
-		ResponseDto responseDto = new ResponseDto();
 
-		if(Optional.ofNullable(requestDto.getBookingId()).isPresent()){
-			//check booking id is valid
-			Optional<Booking> booking = seatBookingRepository.findById(requestDto.getBookingId());
-			if(booking.isPresent()){
-				Booking updatedBooking = booking.get();
-				updatedBooking.setStatus(BookingStatus.CANCELLED);
-				seatBookingRepository.save(updatedBooking);
-				responseDto.setStatus("SUCCESS");
-				responseDto.setMessage("Seat Booking has been successfully cancelled");
-			} else {
-				throw new BusinessException("INVALID_BOOKING", "Booking Id doesn't match with our records");
+		try {
+			ResponseDto responseDto = new ResponseDto();
+
+			if(Optional.ofNullable(requestDto.getBookingId()).isPresent()){
+				//check booking id is valid
+				Optional<Booking> booking = seatBookingRepository.findById(requestDto.getBookingId());
+				if(booking.isPresent()){
+					Booking updatedBooking = booking.get();
+					updatedBooking.setStatus(BookingStatus.CANCELLED);
+					seatBookingRepository.save(updatedBooking);
+					responseDto.setStatus("SUCCESS");
+					responseDto.setMessage("Seat Booking has been successfully cancelled");
+				} else {
+					throw new BusinessException("INVALID_BOOKING", "Booking Id doesn't match with our records");
+				}
 			}
-		}
 
-		if(Optional.ofNullable(requestDto.getWaitListId()).isPresent()){
-			//check waiting list id is valid
-			Optional<WaitList> waitList = waitlistRepository.findById(requestDto.getWaitListId());
-			if(waitList.isPresent()){
-				WaitList updatedWaitList = waitList.get();
-				updatedWaitList.setStatus(WaitList.WaitlistStatus.CANCELLED);
-				waitlistRepository.save(updatedWaitList);
-				responseDto.setStatus("SUCCESS");
-				responseDto.setMessage("Seat Booking has been successfully cancelled");
-			} else {
-				throw new BusinessException("INVALID_WAITLIST", "WaitList Id doesn't match with our records");
+			if(Optional.ofNullable(requestDto.getWaitListId()).isPresent()){
+				//check waiting list id is valid
+				Optional<WaitList> waitList = waitlistRepository.findById(requestDto.getWaitListId());
+				if(waitList.isPresent()){
+					WaitList updatedWaitList = waitList.get();
+					updatedWaitList.setStatus(WaitList.WaitlistStatus.CANCELLED);
+					waitlistRepository.save(updatedWaitList);
+					responseDto.setStatus("SUCCESS");
+					responseDto.setMessage("Seat Booking has been successfully cancelled");
+				} else {
+					throw new BusinessException("INVALID_WAITLIST", "WaitList Id doesn't match with our records");
+				}
 			}
-		}
 
-		//check if the seat
-		return responseDto;
+			//check if the seat
+			return responseDto;
+		} catch (Exception exception) {
+			throw new BusinessException("ERROR_CANCEL_SEAT", "Unable to process your cancel request. Try Again!");
+		}
 	}
 
 	@Transactional

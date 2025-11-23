@@ -44,13 +44,10 @@ public class QRCheckInServiceImpl implements QRCheckInService {
     @Override
     public QRCheckInResponseDto processCheckIn(String seatHashCode, String empId) {
         try {
-            QRCheckInResponseDto qrCheckInResponseDto = new QRCheckInResponseDto();
-
             boolean employeeExist = employeeRepository.existsById(empId);
             if(employeeExist){
-                qrCheckInResponseDto.setStatus("EMP_NOT_FOUND");
-                qrCheckInResponseDto.setMessage("There is no Employee record found");
-                return qrCheckInResponseDto;
+                throw new BusinessException("EMP_NOT_FOUND",
+                        "There is no Employee record found");
             }
 
             LocalDate today = LocalDate.now();
@@ -84,19 +81,16 @@ public class QRCheckInServiceImpl implements QRCheckInService {
                         logger.info("Employee checkIn within time limit of the seat booking");
                         return constructQRCheckInSuccessResponse();
                     } else {
-                        qrCheckInResponseDto.setStatus("QR_SCAN_EXPIRY");
-                        qrCheckInResponseDto.setMessage("Employee is not allowed to checkIn since the time limit has been exceeded");
-                        return qrCheckInResponseDto;
+                        throw new BusinessException("QR_SCAN_EXPIRY",
+                                "Employee is not allowed to checkIn since the time limit has been exceeded");
                     }
                 } else {
-                    qrCheckInResponseDto.setStatus("SEAT_NOT_BOOKED_OR_ALREADY_CHECK_IN");
-                    qrCheckInResponseDto.setMessage("QR checkIn is not possible since the seat is not been booked");
-                    return qrCheckInResponseDto;
+                    throw new BusinessException("SEAT_NOT_BOOKED_OR_ALREADY_CHECK_IN",
+                            "QR checkIn is not possible since the seat is not been booked");
                 }
             } else {
-                qrCheckInResponseDto.setStatus("EMP_ATTENDANCE_NOT_FOUND");
-                qrCheckInResponseDto.setMessage("There is no Employee attendance record for today");
-                return qrCheckInResponseDto;
+                throw new BusinessException("EMP_ATTENDANCE_NOT_FOUND",
+                        "There is no Employee attendance record for today");
             }
         } catch (Exception exception){
             throw new BusinessException("ERROR_QR_SCAN", "Unable to Check-In your seat. Try Again!");
