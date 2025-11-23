@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import com.infosys.seatsync.model.EmailDetails;
 
@@ -21,6 +22,7 @@ public class EmailService {
     
 	private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
+    @Async
     public void sendEmail(EmailDetails emailDetails){
         try {
             SimpleMailMessage mailMsg = new SimpleMailMessage();
