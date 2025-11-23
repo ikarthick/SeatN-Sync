@@ -31,6 +31,8 @@ import com.infosys.seatsync.model.BookSeatResponse;
 import com.infosys.seatsync.model.BookSeatsRequest;
 import com.infosys.seatsync.service.SeatBookingService;
 
+import javax.swing.text.html.Option;
+
 @Service
 public class SeatBookingServiceImpl implements SeatBookingService {
 
@@ -204,6 +206,11 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 
 		try {
 			ResponseDto responseDto = new ResponseDto();
+
+			if(Optional.ofNullable(requestDto.getBookingId()).isEmpty()
+					&& Optional.ofNullable(requestDto.getWaitListId()).isEmpty()){
+				throw new BusinessException("INVALID_REQUEST", "Invalid request - both bookingId and waitListId is not present");
+			}
 
 			if(Optional.ofNullable(requestDto.getBookingId()).isPresent()){
 				//check booking id is valid
