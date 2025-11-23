@@ -29,7 +29,7 @@ public interface SeatBookingRepository extends JpaRepository<Booking, Long> {
 			Booking.BookingStatus status
 	);
 
-	@Query("SELECT b FROM Booking b WHERE b.employee.empId = :empId AND b.bookingDate = :date AND b.status IN ('BOOKED','CHECKEDIN')")
+	@Query("SELECT b FROM Booking b WHERE b.employee.empId = :empId AND b.bookingDate = :date AND b.status IN ('BOOKED','CHECKED_IN')")
 			List<Booking> findEmployeeBookings(String empId, String date);
 
 

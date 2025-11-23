@@ -35,5 +35,11 @@ public interface WaitlistRepository extends JpaRepository<WaitList, Long> {
 
     List<WaitList> findByEmployee_EmpIdOrderByBookingDateAsc(String empId);
 
+    Optional<WaitList> findByEmployee_EmpIdAndBookingDateAndStatus(
+            String empId,
+            String bookingDate,
+            String status
+    );
+
 
 }
