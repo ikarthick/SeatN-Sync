@@ -236,7 +236,7 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 			//check if the seat
 			return responseDto;
 		} catch (Exception exception) {
-			throw new BusinessException("ERROR_CANCEL_SEAT", "Unable to process your cancel request. Try Again!");
+			throw new BusinessException("ERROR_CANCEL_SEAT", exception.getMessage());
 		}
 	}
 

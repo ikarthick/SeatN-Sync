@@ -45,7 +45,8 @@ public class QRCheckInServiceImpl implements QRCheckInService {
     public QRCheckInResponseDto processCheckIn(String seatHashCode, String empId) {
         try {
             boolean employeeExist = employeeRepository.existsById(empId);
-            if(employeeExist){
+            logger.info("Employee Exists: "+ employeeExist);
+            if(!employeeExist){
                 throw new BusinessException("EMP_NOT_FOUND",
                         "There is no Employee record found");
             }
@@ -57,6 +58,7 @@ public class QRCheckInServiceImpl implements QRCheckInService {
 
             //level 1 - Check if the emp has attendance record for the same date
             boolean isAttendanceExists = attendanceLogRepository.existsByEmployee_EmpIdAndSwipeTimeBetween(empId, startOfDay, endOfDay);
+            logger.info("Attendance Exists: "+ isAttendanceExists);
             if(isAttendanceExists) {
                 //level 2 - check if the emp has already had an active booking
                 Optional<Booking> optionalBooking = seatBookingRepository.findByEmployee_EmpIdAndSeat_HashCodeAndBookingDateAndStatus(empId, seatHashCode, getCurrentDate(), Booking.BookingStatus.BOOKED);
@@ -93,7 +95,7 @@ public class QRCheckInServiceImpl implements QRCheckInService {
                         "There is no Employee attendance record for today");
             }
         } catch (Exception exception){
-            throw new BusinessException("ERROR_QR_SCAN", "Unable to Check-In your seat. Try Again!");
+            throw new BusinessException("ERROR_QR_SCAN", exception.getMessage());
         }
 
     }
