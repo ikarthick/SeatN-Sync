@@ -29,6 +29,7 @@ import com.infosys.seatsync.entity.infra.Seat;
 import com.infosys.seatsync.model.AllocationResult;
 import com.infosys.seatsync.model.BookSeatResponse;
 import com.infosys.seatsync.model.BookSeatsRequest;
+import com.infosys.seatsync.model.EmailDetails;
 import com.infosys.seatsync.service.SeatBookingService;
 
 @Service
@@ -48,6 +49,9 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 
 	@Autowired
 	SeatRepository seatRepository;
+	
+	@Autowired
+	EmailService emailService;
 
 	private static final Logger logger = LoggerFactory.getLogger(SeatBookingServiceImpl.class);
 
@@ -189,7 +193,17 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 
 			response.getResults().add(result);
 		}
-
+        
+		for(AllocationResult result:response.getResults()) {
+			if(null != result.getAllocatedSeatCode()) {
+				EmailDetails emailDetails=new EmailDetails();
+				emailDetails.setRecipient(bookingEmployee.get().getEmail());
+				String msg= "Seat id : " + result.getAllocatedSeatCode() + "Booked Successfully";
+				emailDetails.setMessageBody(msg);
+				emailDetails.setSubject("Seat Allocation Notification");
+				emailService.sendEmail(emailDetails);
+			}
+		}
 		return response;
 	}
 
@@ -206,6 +220,14 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 				seatBookingRepository.save(updatedBooking);
 				responseDto.setStatus("SUCCESS");
 				responseDto.setMessage("Seat Booking has been successfully cancelled");
+				if(responseDto.getStatus().equals("SUCCESS")) {
+					EmailDetails emailDetails=new EmailDetails();
+					emailDetails.setRecipient(booking.get().getEmployee().getEmail());
+					String msg= "Seat id : " + updatedBooking.getSeat().getSeatId() + " cancelled Successfully";
+					emailDetails.setMessageBody(msg);
+					emailDetails.setSubject("Seat Cancellation Notification");
+					emailService.sendEmail(emailDetails);
+				}
 			} else {
 				throw new BusinessException("INVALID_BOOKING", "Booking Id doesn't match with our records");
 			}
@@ -220,6 +242,14 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 				waitlistRepository.save(updatedWaitList);
 				responseDto.setStatus("SUCCESS");
 				responseDto.setMessage("Seat Booking has been successfully cancelled");
+				if(responseDto.getStatus().equals("SUCCESS")) {
+					EmailDetails emailDetails=new EmailDetails();
+					emailDetails.setRecipient(waitList.get().getEmployee().getEmail());
+					String msg= "Waitinglist id : " + requestDto.getWaitListId() + " cancelled Successfully";
+					emailDetails.setMessageBody(msg);
+					emailDetails.setSubject("Seat Cancellation Notification");
+					emailService.sendEmail(emailDetails);
+				}
 			} else {
 				throw new BusinessException("INVALID_WAITLIST", "WaitList Id doesn't match with our records");
 			}
