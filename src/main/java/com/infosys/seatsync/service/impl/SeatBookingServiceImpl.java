@@ -1,5 +1,7 @@
 package com.infosys.seatsync.service.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -313,12 +315,28 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 		b.setStatus(BookingStatus.BOOKED);
 		Employee emp = bookingEmployee.get();
 		b.setEmployee(emp);
-		b.setStartTime(getCappedTime());
+		b.setStartTime(getStartTime(date));
 		b.setEndTime("20:00");
 		b.setSeat(seat);
 		Employee manager = employeeRepository.findById(managerId).orElse(null);
 		b.setBookedBy(manager);
 		seatBookingRepository.save(b);
+	}
+
+	public static String getStartTime(String date) {
+		// Input date is expected in format "yyyy-MM-dd"
+		LocalDate inputDate = LocalDate.parse(date);
+
+		LocalDate today = LocalDate.now();
+		LocalTime now = LocalTime.now();
+
+		if (inputDate.isEqual(today)) {
+			// Format current time as HH:mm
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+			return now.format(formatter);
+		} else {
+			return "09:00";
+		}
 	}
 
 	public static String getCappedTime() {
