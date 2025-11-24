@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
@@ -112,18 +109,24 @@ public class QRCheckInServiceImpl implements QRCheckInService {
 
     public boolean isWithinCheckInBuffer(String startTime, int bufferMinutes) {
 
-        // Parse string like "9:00" or "14:30"
+        ZoneId zone = ZoneId.of("Asia/Kolkata");
+
+        // Parse booking start time (e.g., "9:00" or "14:30")
         LocalTime bookingStart = LocalTime.parse(startTime, DateTimeFormatter.ofPattern("H:mm"));
 
         // Add buffer
         LocalTime bufferEnd = bookingStart.plusMinutes(bufferMinutes);
 
-        // Current time
-        LocalTime now = LocalTime.now();
-        logger.info("Booking start Time :"+ bookingStart +" & BufferEnd Period: "+ bufferEnd + " & Current Time :"+ now);
+        // Current time in IST
+        LocalTime now = LocalTime.now(zone);
+
+        logger.info("Booking start Time :" + bookingStart
+                + " & BufferEnd Period: " + bufferEnd
+                + " & Current Time :" + now);
 
         return !now.isBefore(bookingStart) && !now.isAfter(bufferEnd);
     }
+
 
     private QRCheckInResponseDto constructQRCheckInSuccessResponse(){
         QRCheckInResponseDto qrCheckInResponseDto = new QRCheckInResponseDto();
