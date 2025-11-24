@@ -3,6 +3,7 @@ package com.infosys.seatsync.service.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -324,20 +325,20 @@ public class SeatBookingServiceImpl implements SeatBookingService {
 	}
 
 	public static String getStartTime(String date) {
-		// Input date is expected in format "yyyy-MM-dd"
+		ZoneId zone = ZoneId.of("Asia/Kolkata");   // Ensure IST
 		LocalDate inputDate = LocalDate.parse(date);
 
-		LocalDate today = LocalDate.now();
-		LocalTime now = LocalTime.now();
+		LocalDate today = LocalDate.now(zone);
+		LocalTime now = LocalTime.now(zone);
 
 		if (inputDate.isEqual(today)) {
-			// Format current time as HH:mm
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 			return now.format(formatter);
 		} else {
 			return "09:00";
 		}
 	}
+
 
 	public static String getCappedTime() {
 
